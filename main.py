@@ -4,7 +4,7 @@ from src.parser_facade import Parser
 from src.parsers import ChatParserIterator
 from src.parsers import ChannelCommentsParserIterator
 from src.settings import JsonSettings
-from src.exporters import JsonExporter
+from src.exporters import CsvExporter
 
 settings = JsonSettings().load()
 
@@ -20,7 +20,7 @@ if settings.entity_type == 'chat':
 elif settings.entity_type == 'channel':
     parser_iterator = ChannelCommentsParserIterator(client, settings.entity_to_parse)
 
-parser = Parser(client, settings, JsonExporter(), parser_iterator)
+parser = Parser(client, settings, CsvExporter(), parser_iterator)
 
 if __name__ == '__main__':
     parser.run()
