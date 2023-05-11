@@ -1,3 +1,5 @@
+import typing
+import asyncio
 import threading
 import telethon
 import tkinter as tk
@@ -74,8 +76,16 @@ class CrabApp(tk.Frame):
 
         parser = Parser(client, current_setting, CsvExporter(), parser_iterator)
 
-        threading.Thread(target=parser.run).start()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        threading.Thread(target=self._sync_to_async_bridge, args=(parser.main_parser_loop,)).start()
         messagebox.showinfo("Інфо", "Парсер запущений успішно!")
+
+    def _sync_to_async_bridge(self, function: typing.Callable):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(function())
 
 if __name__ == "__main__":
     root = tk.Tk()
