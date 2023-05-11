@@ -1,0 +1,5 @@
+__pycache__
+.venv
+account
+parser_results.json
+settings.json
