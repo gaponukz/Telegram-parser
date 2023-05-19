@@ -1,3 +1,4 @@
+import typing
 import random
 import asyncio
 import telethon
@@ -12,11 +13,13 @@ class Parser:
         client: telethon.TelegramClient,
         setting: entities.Settings,
         exporter: exporters.IExporter,
-        parser_iterator: parsers.IParserIterator
+        parser_iterator: parsers.IParserIterator,
+        logger_writer: typing.Callable[[str], None]
     ):
         self.setting = setting
         self.exporter = exporter
         self.parser_iterator = parser_iterator
+        self.logger_writer = logger_writer
 
         self.unique_parsed: set[str] = set()
         self.ready_to_export_users: list[entities.User] = []
@@ -31,10 +34,10 @@ class Parser:
     def _get_users_count(self) -> int:
         return len(self.unique_parsed)
     
-    async def main_parser_loop(self):
-        already_parsed_users: list[entities.User] = []
-        
+    async def main_parser_loop(self):        
         async with self.client:
+            self.logger_writer("Client started successfully")
+            
             async for user in self.parser_iterator:
                 total_users_count = self._get_users_count()
                 
