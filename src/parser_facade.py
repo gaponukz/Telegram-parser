@@ -6,17 +6,16 @@ import telethon
 from src import entities
 from src import exporters
 from src import parsers
+from src import utils
 
 class Parser:
     def __init__(
         self,
         client: telethon.TelegramClient,
-        setting: entities.Settings,
         exporter: exporters.IExporter,
         parser_iterator: parsers.IParserIterator,
         logger_writer: typing.Callable[[str], None]
     ):
-        self.setting = setting
         self.exporter = exporter
         self.parser_iterator = parser_iterator
         self.logger_writer = logger_writer
@@ -34,28 +33,22 @@ class Parser:
     def _get_users_count(self) -> int:
         return len(self.unique_parsed)
     
-    async def main_parser_loop(self):        
+    async def main_parser_loop(self):
         async with self.client:
-            self.logger_writer("Client started successfully")
+            self.logger_writer("Парсер розпочав роботу")
             
-            async for user in self.parser_iterator:
-                total_users_count = self._get_users_count()
-                
-                if total_users_count == self.setting.user_count_limit:
-                    break
+            async for user in self.parser_iterator:                
+                users_count = self._get_users_count()
 
-                if self._get_users_count() % 5 == 0:
+                if utils.flip_a_coin(0.05):
+                    self.logger_writer(f"Більше ніж {users_count} користувачів зібрано")
                     self.exporter.export(self.ready_to_export_users)
 
                 self._add_user(user)
 
-                if self._flip_a_coin():
+                if utils.flip_a_coin(0.05):
                     await asyncio.sleep(random.randint(1, 5))
         
+        self.logger_writer("Парсер закінчив роботу")
         self.exporter.export(self.ready_to_export_users)
-
-    def _flip_a_coin(self) -> bool:
-        return random.choices([True, False], [0.05, 0.95])[0]
-    
-    def run(self):
-        self.client.loop.run_until_complete(self.main_parser_loop())
+        self.logger_writer("Результат збережено")
