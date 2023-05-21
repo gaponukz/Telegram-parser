@@ -20,15 +20,12 @@ class CrabApp(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.title("Краб")
+        self.master.title("Crab 1.0.0")
         self.master.resizable(0, 0)
+        self.master.iconbitmap("logo.ico")
         self._create_widgets()
 
     def _create_widgets(self):
-        # self.start_button = tk.Button(self.master, text="Стартуємо", command=self._start)
-        # self.start_button.grid(row=3, column=0, padx=10, pady=10, sticky=tk.E)
-        
-        # Top Row (label, input, button)
         Label(self.master, text="Посилання на telegram-канал: ",
               font=('Segoe UI', 11), relief=RIDGE).grid(row=0, column=0, padx=5,
                                                         pady=5)
@@ -39,7 +36,7 @@ class CrabApp(tk.Frame):
         self.button_start = Button(self.master, text="Старт",
                                    command=self._button_pressed,
                                    font=('Segoe UI', 10), relief=RAISED,
-                                   fg='black', bg='#FF7F50', width=8, height=1)
+                                   fg='black', bg='#ffffff', width=8, height=1)
         self.button_start.grid(row=0, column=2, sticky=E, padx=10)
 
         # Frame, containing output data
@@ -74,14 +71,6 @@ class CrabApp(tk.Frame):
         self.text.insert('end',  time.strftime('%H:%M:%S', time.localtime(time.time())) + ' ' + text + '\n')
         self.text.configure(state=DISABLED)
        
-    def _start(self):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        
-        parser = ParserMock(self._on_send_logging_callback)
-        threading.Thread(target=self._sync_to_async_bridge, args=(parser.main_parser_loop,)).start()
-        messagebox.showinfo("Інфо", "Парсер запущений успішно!")
-
     def _sync_to_async_bridge(self, function: typing.Coroutine):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
