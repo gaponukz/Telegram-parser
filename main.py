@@ -35,9 +35,9 @@ class CrabApp(tk.Frame):
         self.link_input.grid(row=0, column=1, sticky=EW)
 
         self.button_start = Button(self.top, text="Старт",
-                                   command=self._button_pressed(),
+                                   command=self._button_pressed,
                                    font=('Segoe UI', 10), relief=RAISED,
-                                   fg='black', bg='#80FFCC', width=8, height=1)
+                                   fg='black', bg='#FF7F50', width=8, height=1)
         self.button_start.grid(row=0, column=2, sticky=E, padx=10)
 
         # Frame, containing output data
