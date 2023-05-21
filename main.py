@@ -9,10 +9,6 @@ from src import utils
 from src.parser_facade import Parser
 from src.settings import ISetting, JsonSettings
 from src.exporters import IExporter, CsvExporter
-from src.parsers import (
-    ChatParserIterator,
-    ChannelCommentsParserIterator
-)
 
 class CrabApp(tk.Frame):
     def __init__(self, master: tk.Tk, setting: ISetting, exporter: IExporter):
@@ -64,13 +60,10 @@ class CrabApp(tk.Frame):
         asyncio.set_event_loop(loop)
 
         client = utils.build_client_from_settings(self.setting)
-        is_channel = utils.sync_to_async_bridge(utils.is_channel_link(client, link))
-        
-        if is_channel:
-            parser_iterator = ChannelCommentsParserIterator(client, link)
-        
-        else:
-            parser_iterator = ChatParserIterator(client, link)
+
+        parser_iterator = utils.sync_to_async_bridge(
+            utils.get_parser_iterator_due_to_link(client, link)
+        )
 
         parser = Parser(client, self.exporter, parser_iterator, self._on_send_logging_callback)
 

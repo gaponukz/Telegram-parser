@@ -4,6 +4,11 @@ import random
 import telethon
 
 from src.entities import Settings
+from src.parsers import (
+    IParserIterator,
+    ChatParserIterator,
+    ChannelCommentsParserIterator
+)
 
 T = typing.TypeVar('T')
 
@@ -38,3 +43,6 @@ def build_client_from_settings(settings: Settings) -> telethon.TelegramClient:
         settings.account.api_id,
         settings.account.api_hash
     )
+
+async def get_parser_iterator_due_to_link(client: telethon.TelegramClient, link: str) -> IParserIterator:
+    return (ChannelCommentsParserIterator if await is_channel_link(client, link) else ChatParserIterator)(client, link)

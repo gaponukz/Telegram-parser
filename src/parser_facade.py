@@ -16,14 +16,13 @@ class Parser:
         parser_iterator: parsers.IParserIterator,
         logger_writer: typing.Callable[[str], None]
     ):
+        self.client = client
         self.exporter = exporter
         self.parser_iterator = parser_iterator
         self.logger_writer = logger_writer
 
         self.unique_parsed: set[str] = set()
         self.ready_to_export_users: list[entities.User] = []
-
-        self.client = client
 
     def _add_user(self, user: entities.User):
         if not str(user) in self.unique_parsed:
