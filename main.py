@@ -1,8 +1,10 @@
+import time
 import typing
 import asyncio
 import threading
 import tkinter as tk
 
+from tkinter import *
 from tkinter import messagebox
 
 class ParserMock:
@@ -19,7 +21,7 @@ class CrabApp(tk.Frame):
         super().__init__(master)
         self.master = master
         self.master.title("Краб")
-        self.top.resizable(0, 0)
+        self.master.resizable(0, 0)
         self._create_widgets()
 
     def _create_widgets(self):
@@ -27,21 +29,21 @@ class CrabApp(tk.Frame):
         # self.start_button.grid(row=3, column=0, padx=10, pady=10, sticky=tk.E)
         
         # Top Row (label, input, button)
-        Label(self.top, text="Посилання на telegram-канал: ",
+        Label(self.master, text="Посилання на telegram-канал: ",
               font=('Segoe UI', 11), relief=RIDGE).grid(row=0, column=0, padx=5,
                                                         pady=5)
 
-        self.link_input = Entry(self.top, font=('arial', 10), width=50)
+        self.link_input = Entry(self.master, font=('arial', 10), width=50)
         self.link_input.grid(row=0, column=1, sticky=EW)
 
-        self.button_start = Button(self.top, text="Старт",
+        self.button_start = Button(self.master, text="Старт",
                                    command=self._button_pressed,
                                    font=('Segoe UI', 10), relief=RAISED,
                                    fg='black', bg='#FF7F50', width=8, height=1)
         self.button_start.grid(row=0, column=2, sticky=E, padx=10)
 
         # Frame, containing output data
-        self.output_frame = Frame(self.top)
+        self.output_frame = Frame(self.master)
         self.output_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=EW)
 
         self.text = Text(self.output_frame, font=('Cascadia Code', 10, "bold"), bg='#000000', fg='#149414',
@@ -59,10 +61,13 @@ class CrabApp(tk.Frame):
             messagebox.showinfo("", "Wrong time input. Try Again")
             return
 
-        # self.link_input.get()   # Value of an input link field.
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         
-        # display of new lines
-
+        parser = ParserMock(self._on_send_logging_callback)
+        threading.Thread(target=self._sync_to_async_bridge, args=(parser.main_parser_loop,)).start()
+        messagebox.showinfo("Інфо", "Парсер запущений успішно!")
+    
     def _on_send_logging_callback(self, text: str) -> None:
         """Displays string" in a Text widget"""
         self.text.configure(state=NORMAL)
